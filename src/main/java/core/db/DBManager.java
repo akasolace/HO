@@ -928,6 +928,10 @@ public class DBManager {
 		return m_iLatestHRFid;
 	}
 
+	public HRF getHrf(int id) {
+		return ((HRFTable) getTable(HRFTable.TABLENAME)).getHRF(id);
+	}
+
 	/**
 	 * get latest update time based on latest HRF file
 	 *

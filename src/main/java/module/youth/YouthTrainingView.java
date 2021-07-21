@@ -1,13 +1,20 @@
 package module.youth;
 
+import core.gui.HOMainFrame;
 import core.gui.RefreshManager;
+import core.gui.Refreshable;
 import core.gui.comp.renderer.HODefaultTableCellRenderer;
 import core.gui.model.UserColumnController;
+import core.module.IModule;
 
 import javax.swing.*;
 import javax.swing.table.TableColumnModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
-public class YouthTrainingView extends JScrollPane implements core.gui.Refreshable {
+public class YouthTrainingView extends JScrollPane implements Refreshable {
 
     private JTable table;
     private YouthTrainingViewTableModel tableModel;
@@ -49,8 +56,6 @@ public class YouthTrainingView extends JScrollPane implements core.gui.Refreshab
             tableModel.restoreUserSettings(table);
         }
         tableModel.initData();
-        //tableSorter = new TableSorter(tableModel, tableModel.getPositionInArray(99), getOrderByColumn());
-        //tableSorter.initsort();
     }
 
     @Override
@@ -68,4 +73,10 @@ public class YouthTrainingView extends JScrollPane implements core.gui.Refreshab
     public void storeUserSettings() {
         this.tableModel.storeUserSettings(table);
     }
+/*
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        var youthPanel = (YouthPanel) HOMainFrame.instance().getTabbedPane().getModulePanel(IModule.YOUTH);
+        youthPanel.refreshYouthPlayerView();
+    }*/
 }

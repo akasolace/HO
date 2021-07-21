@@ -127,13 +127,14 @@ public class YouthSkillsInfo extends HashMap<Skills.HTSkillID, YouthSkillInfo> {
                 }
             }
         } else {
+            var isKeeper = this.areKeeperSkills();
             // three skills are marked as top3 skill
             // mark 4 other skills and set maximum to lowest top3 max
             for (var skill : this.values()) {
                 if (skill.isTop3() == null || !skill.isTop3()) {
                     skill.setIsTop3(false);
                     if (!skill.isMaxAvailable()) {
-                        skill.setMax(minTop3Max);
+                        skill.setMaxLimit(isKeeper, minTop3Max);
                     }
                 }
             }

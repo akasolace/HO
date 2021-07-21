@@ -367,6 +367,16 @@ public class YouthPlayer {
         this.hrfid = hrfid;
     }
 
+    private Timestamp statusTime;
+    private Timestamp getStatusTime(){
+        if ( statusTime == null){
+            statusTime = DBManager.instance().getHrf(this.hrfid).getDatum();
+        }
+        return statusTime;
+    }
+
+
+
     public Timestamp getPromotionDate() {
         return promotionDate;
     }
@@ -510,6 +520,7 @@ public class YouthPlayer {
         if (!date.equals(this.youthMatchDate)) {
             var oldPlayerInfo = getOldPlayerInfo(date);
             if (oldPlayerInfo != null) {
+                setKnownMaxValues(oldPlayerInfo.currentSkills);
                 return oldPlayerInfo.currentSkills;
             } else {
                 var ret = getStartSkills();
@@ -519,10 +530,19 @@ public class YouthPlayer {
                     }
                     ret = entry.getValue().getSkills();
                 }
+                setKnownMaxValues(ret);
                 return ret;
             }
         }
         return this.currentSkills;
+    }
+
+    private void setKnownMaxValues(YouthSkillsInfo skills) {
+        for ( var currentSkill : this.currentSkills.values()){
+            if ( currentSkill.getMax() != null ){
+                skills.get(currentSkill.getSkillID()).setMax(currentSkill.getMax());
+            }
+        }
     }
 
     /**
@@ -628,6 +648,14 @@ public class YouthPlayer {
 
     public double getProgressLastMatch() {
         return progressLastMatch;
+    }
+
+    public int getAgeYearsAtDate(Timestamp matchDate) {
+        var hrfdate = this.getStatusTime().getTime();
+        long time = matchDate.getTime();
+        long diff = (hrfdate - time) / (1000 * 60 * 60 * 24);
+        long ageInDays = getAgeDays() + 112 * getAgeYears() - diff;
+        return (int)(ageInDays / 112);
     }
 
     public static class ScoutComment {
@@ -948,11 +976,14 @@ public class YouthPlayer {
     public int getPotential()
     {
         if ( potential == null){
+            //HOLogger.instance().info(this.getClass(), "getPotential " + this.getFullName() + " " + this.getAgeYears() + "," + this.getAgeDays());
             calcMaxSkills17();
-            potential=0;
+            double p = 0d;
             for ( var skillId: skillIds){
-                potential += (int)(getSkillInfo(skillId).getPotential17Value() / YouthTraining.potentialNormingFactor.get(skillId));
+                p += max(0, getSkillInfo(skillId).getPotential17Value() - 4) / YouthTraining.potentialNormingFactor.get(skillId);
+                //HOLogger.instance().info(this.getClass(), skillId.toString() + "=" + getSkillInfo(skillId).getPotential17Value() + " p=" + p);
             }
+            potential = (int)Math.round(p);
         }
         return potential;
     }
@@ -969,8 +1000,8 @@ public class YouthPlayer {
             if (this.getTrainingDevelopment().size() > 0) {
                 for (var entry : this.getTrainingDevelopment().values()) {
                     // find skill when player's age skipped to 17
+                    skill17 = entry.getSkills();
                     if (entry.getPlayerAgeYears() > 16) {
-                        skill17 = entry.getSkills();
                         break;
                     }
                 }
@@ -988,40 +1019,42 @@ public class YouthPlayer {
         else {
             // The player is younger than 17 years old
             // The possible training is divided among the unfinished skills
-            var nnumberOfUnfishedTrainings = this.currentSkills.values().stream()
-                    .filter(i->!i.isMaxReached())
+            var numberOfUsefulTrainings = this.currentSkills.values().stream()
+                    .filter(YouthSkillInfo::isTrainingUsefull)
                     .count();
             int age = this.getAgeYears();
             int days = this.getAgeDays();
-            while (age < 17 && nnumberOfUnfishedTrainings > 0) {
+            while (age < 17 && numberOfUsefulTrainings > 0) {
                 // for each week until age of 17 is reached
                 int ntrainingsMaxReached=0;
                 for (var skill : this.currentSkills.values()) {
                     // find new maximum value of each skill
                     var maxVal = skill.getCurrentValue();
-                    if (skill.getPotential17Value() != null) maxVal = skill.getPotential17Value();
-                    // limit of skill
-                    var skillLimit = 8.3;
-                    if (skill.getMax() != null && skill.getMax() < 8) {
-                        skillLimit = skill.getMax() + .99;
-                    }
-                    if (!skill.isMaxReached() && maxVal < skillLimit) { // if maximum is not beyond the given limit
-                        // maximum weekly increment of the skill
-                        double increment = YouthTraining.getMaxTrainingPerWeek(skill.getSkillID(), (int) maxVal, age);
-                        // increment maximum value as if the training could be distributed among the unfinished skills
-                        maxVal += increment / nnumberOfUnfishedTrainings;
-                        // check if limit is reached
-                        if (maxVal > skillLimit) {
-                            maxVal = skillLimit;
-                            // register newly finished skill
-                            ntrainingsMaxReached++;
+                    if ( skill.isTrainingUsefull()) {
+                        if (skill.getPotential17Value() != null) maxVal = skill.getPotential17Value();
+                        // limit of skill
+                        var skillLimit = 8.3;
+                        if (skill.getMax() != null && skill.getMax() < 8) {
+                            skillLimit = skill.getMax() + .99;
+                        }
+                        if (!skill.isMaxReached() && maxVal < skillLimit) { // if maximum is not beyond the given limit
+                            // maximum weekly increment of the skill
+                            double increment = YouthTraining.getMaxTrainingPerWeek(skill.getSkillID(), (int) maxVal, age);
+                            // increment maximum value as if the training could be distributed among the unfinished skills
+                            maxVal += increment / numberOfUsefulTrainings;
+                            // check if limit is reached
+                            if (maxVal > skillLimit) {
+                                maxVal = skillLimit;
+                                // register newly finished skill
+                                ntrainingsMaxReached++;
+                            }
                         }
                     }
                     // set new maximum skill value
                     skill.setPotential17Value(maxVal);
                 }
                 // decrement number of unfinished trainings
-                nnumberOfUnfishedTrainings-=ntrainingsMaxReached;
+                numberOfUsefulTrainings-=ntrainingsMaxReached;
                 // player's age of next week
                 days += 7;
                 if (days > 111) {

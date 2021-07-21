@@ -193,6 +193,10 @@ public class YouthSkillInfo {
         return isMaxReached;
     }
 
+    public boolean isTrainingUsefull(){
+        return !isMaxReached() && (!this.isMaxAvailable() || this.getMax()>4);
+    }
+
     public void setMaxReached(boolean maxReached) {
         isMaxReached = maxReached;
     }
@@ -243,10 +247,45 @@ public class YouthSkillInfo {
         return this.isTop3Skill;
     }
 
+    /**
+     * get the minumum potential value. This is the maximum value if it is known
+     * or the current level value, if maximum is unknown
+     * @return int, 0 if neither current level nor maximum is known
+     */
     public int getMinimumPotential() {
         if (this.max != null) return this.max;
         if (this.currentLevel != null) return this.currentLevel;
         return 0;
+    }
+
+    /**
+     * Set the upper limit of skill maximum (potential).
+     * The value is not for sure and could be reduced by future trainer reports
+     * @param isKeeper Boolean
+     *                  true, players skills are keeper skills
+     *                  false, player skills are infield skills
+     *                  null, unknown
+     * @param minTop3Max int limit of potential
+     */
+    public void setMaxLimit(Boolean isKeeper, int minTop3Max) {
+        if ( this.max != null && this.max <= minTop3Max) return;  // nothing to do
+        if (  minTop3Max < 5) {
+            setMax(minTop3Max);
+        }
+        else if ( isKeeper != null){
+            if ( isKeeper) {
+                switch (this.skillID) {
+                    case Keeper, Defender, SetPieces -> setMax(minTop3Max);
+                }
+            }
+            else {
+                switch (this.skillID) {
+                    case Defender, Winger, Playmaker, Passing, Scorer, SetPieces -> setMax(minTop3Max);
+                }
+            }
+        }
+        this.currentValueRange.lessThan(minTop3Max+1);
+        this.startValueRange.lessThan(minTop3Max+1);
     }
 
     // Skill Range class

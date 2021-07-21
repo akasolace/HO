@@ -336,7 +336,7 @@ final class DBUpdater {
 			//List<String> lTables = List.of("IFA_MATCHES", "MATCHDETAILS", "MATCHLINEUP", "MATCHHIGHLIGHTS", "MATCHLINEUPPLAYER", "MATCHLINEUPTEAM",
 			//		"MATCHORDER", "MATCHSUBSTITUTION");
 
-			copyMatchTypes("MATCHESKURZINFO", "IFA_MATCHES");		// TODO: check, what are IFA matches?
+			copyMatchTypes("MATCHESKURZINFO", "IFA_MATCHES");
 			copyMatchTypes("MATCHESKURZINFO", "MATCHORDER");		// no lineup available yet for match orders
 			copyMatchTypes("MATCHLINEUP", "MATCHDETAILS");
 			copyMatchTypes("MATCHLINEUP", "MATCHHIGHLIGHTS");

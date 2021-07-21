@@ -9,7 +9,9 @@ import core.model.enums.MatchTypeExtended;
 import core.net.OnlineWorker;
 import core.util.HOLogger;
 import core.util.HTDatetime;
+import org.jetbrains.annotations.Nullable;
 
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 
 import static core.util.StringUtils.getResultString;
@@ -46,6 +48,7 @@ public class MatchKurzInfo implements Comparable<Object> {
 
 	/** MatchContextId */
 	private int iMatchContextId;
+
 	public int getMatchContextId() {
 		return iMatchContextId;
 	}
@@ -154,7 +157,7 @@ public class MatchKurzInfo implements Comparable<Object> {
 	 * @param m_sGastName
 	 *            New value of property m_sGastName.
 	 */
-	public final void setGuestTeamName(java.lang.String m_sGastName) {
+	public final void setGuestTeamName(String m_sGastName) {
 		this.m_sGastName = m_sGastName;
 	}
 
@@ -163,7 +166,7 @@ public class MatchKurzInfo implements Comparable<Object> {
 	 * 
 	 * @return Value of property m_sGastName.
 	 */
-	public final java.lang.String getGuestTeamName() {
+	public final String getGuestTeamName() {
 		return m_sGastName;
 	}
 
@@ -213,7 +216,7 @@ public class MatchKurzInfo implements Comparable<Object> {
 	 * @param m_sHeimName
 	 *            New value of property m_sHeimName.
 	 */
-	public final void setHomeTeamName(java.lang.String m_sHeimName) {
+	public final void setHomeTeamName(String m_sHeimName) {
 		this.m_sHeimName = m_sHeimName;
 	}
 
@@ -222,7 +225,7 @@ public class MatchKurzInfo implements Comparable<Object> {
 	 * 
 	 * @return Value of property m_sHeimName.
 	 */
-	public final java.lang.String getHomeTeamName() {
+	public final String getHomeTeamName() {
 		return m_sHeimName;
 	}
 
@@ -276,7 +279,7 @@ public class MatchKurzInfo implements Comparable<Object> {
 	 * 
 	 * @return Value of property m_lDatum.
 	 */
-	public java.sql.Timestamp getMatchDateAsTimestamp() {
+	public Timestamp getMatchDateAsTimestamp() {
 			return getMatchDateAsTimestamp(false);
 	}
 
@@ -285,7 +288,7 @@ public class MatchKurzInfo implements Comparable<Object> {
 	 *
 	 * @return Value of property m_lDatum.
 	 */
-	public java.sql.Timestamp getMatchDateAsTimestamp(boolean localized) {
+	public Timestamp getMatchDateAsTimestamp(boolean localized) {
 		if (localized) {
 			return m_matchSchedule.getUserLocalizedTimeAsTimestamp();
 		}
@@ -552,5 +555,74 @@ public class MatchKurzInfo implements Comparable<Object> {
 			return getResultString(-1,-1,"");
 		}
 		return getMatchdetails().getResultLong();
+	}
+
+	public double getExperienceIncrease(int minutes) {
+		double p;
+		var _matchType = this.getMatchTypeExtended();
+		if (_matchType instanceof MatchType){
+			p = switch ((MatchType) _matchType){
+				case CUP, QUALIFICATION -> 2d;
+				case FRIENDLYNORMAL, FRIENDLYCUPRULES -> .1;
+				case INTFRIENDLYCUPRULES, INTFRIENDLYNORMAL -> .2;
+				case NATIONALFRIENDLY, LEAGUE -> 1d;
+				case MASTERS -> 5d;
+				case NATIONALCOMPCUPRULES -> 16d;
+				case NATIONALCOMPNORMAL -> 8d;
+				case TOURNAMENTGROUP -> getTournamentExperienceFactor(TournamentType.getById(this.iMatchContextId), false);
+				case TOURNAMENTPLAYOFF -> getTournamentExperienceFactor(TournamentType.getById(this.iMatchContextId), true);
+				default -> 0d;
+			};
+		} else{
+			//case MatchTypeExtended.EMERALDCUP, MatchTypeExtended.RUBYCUP, MatchTypeExtended.SAPPHIRECUP -> .5;
+			p = 0.5;
+		}
+		return minutes * p / 90. / 28.571;
+	}
+
+	/**
+	 * get experience factor of tournament natianal team matches
+	 * TODO: check if playoffs are really tagged by MatchType.TOURNAMENTPLAYOFF
+	 * @param tournamentType tournament type of the match, null if no tournament match
+	 * @param isPlayOff boolean, true if play off tournament match
+	 * @return factor of league match experience increases (3.5)
+	 */
+	private double getTournamentExperienceFactor(@Nullable TournamentType tournamentType, boolean isPlayOff) {
+		if ( tournamentType == null) return 0d;
+		if ( tournamentType.isWorldCup()){
+			// WM-Spiel	28
+			//WM-Halbfinal, WM-Final	56
+				if ( isPlayOff){
+					return 56/3.5;
+				}
+				else {
+					return 28/3.5;
+				}
+		}
+		else if ( tournamentType.isNationsCup()){
+			//Nationenpokal	7
+			//Nationenpokal (K.O.)	14
+			if ( isPlayOff){
+				return 14/3.5;
+			}
+			else {
+				return 7/3.5;
+			}
+		}
+		else if ( tournamentType.isContinentalCup()){
+			//Kontinentalmeisterschaftsspiel	14
+			//Kontinentalmeisterschaftsspiel (Viertel-, Halbfinal, Final)	21
+			if ( isPlayOff){
+				return 21/3.5;
+			}
+			else {
+				return 14/3.5;
+			}
+		}
+		else if ( tournamentType.isNTFriendly()){
+			//Nationalteam Freundschaftsspiel	3.5
+			return 1d;
+		}
+		return 0d;
 	}
 }

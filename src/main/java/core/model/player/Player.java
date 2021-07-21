@@ -1942,10 +1942,10 @@ public class Player {
      */
     public TrainingPerPlayer calculateWeeklyTraining(TrainingPerWeek train) {
         final int playerID = this.getPlayerID();
-        TrainingPerPlayer output = new TrainingPerPlayer(this);
-        output.setTrainingWeek(train);
+        TrainingPerPlayer ret = new TrainingPerPlayer(this);
+        ret.setTrainingWeek(train);
         if (train == null || train.getTrainingType() < 0) {
-            return output;
+            return ret;
         }
 
         WeeklyTrainingType wt = WeeklyTrainingType.instance(train.getTrainingType());
@@ -1968,7 +1968,7 @@ public class Player {
                         tp.addOsmosisTrainingMinutes(mlt.getTrainingMinutesPlayedInSectors(playerID, wt.getOsmosisTrainingSectors(), walkoverWin));
                     }
                     tp.addPlayedMinutes(mlt.getTrainingMinutesPlayedInSectors(playerID, null, walkoverWin));
-                    output.addExperienceIncrease(min(90,tp.getPlayedMinutes() - minutes), match.getMatchTypeExtended());
+                    ret.addExperience(match.getExperienceIncrease(min(90,tp.getPlayedMinutes())));
                     minutes = tp.getPlayedMinutes();
                 }
                 TrainingPoints trp = new TrainingPoints(wt, tp);
@@ -1976,21 +1976,21 @@ public class Player {
                 // get experience increase of national matches
                 if  ( this.getNationalTeamID() != 0 && this.getNationalTeamID() != myID){
                     // TODO check if national matches are stored in database
-                    var nationalMatches = train.getNTmatches();
+                    var nationalMatches = train.loadMatchesOfNTPlayers(this.getNationalTeamID());
                     for (var match : nationalMatches){
                         MatchLineupTeam mlt = DBManager.instance().getMatchLineupTeam(match.getMatchType().getId(), match.getMatchID(), this.getNationalTeamID());
                         minutes = mlt.getTrainingMinutesPlayedInSectors(playerID, null, false);
                         if ( minutes > 0 ) {
-                            output.addExperienceIncrease(min(90,minutes), match.getMatchTypeExtended());
+                            ret.addExperience(match.getExperienceIncrease(min(90,tp.getPlayedMinutes())));
                         }
                     }
                 }
-                output.setTrainingPair(trp);
+                ret.setTrainingPair(trp);
             } catch (Exception e) {
                 HOLogger.instance().log(getClass(),e);
             }
         }
-        return output;
+        return ret;
     }
 
     private void addExperienceSub(double experienceSub) {

@@ -60,6 +60,7 @@ If you find a bug, please open an issue on [GitHub](https://github.com/akasolace
 ### Training
   - many bug fixes
   - fix training recap table's resetting scroll positions on table refresh  (#1011) 
+  - experience increase of new national hto matches (#1089)
   
 
 

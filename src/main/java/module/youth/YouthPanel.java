@@ -25,4 +25,8 @@ public class YouthPanel extends JPanel {
         youthPlayerView.storeUserSettings();
         youthTrainingView.storeUserSettings();
     }
+
+    public void refreshYouthPlayerView() {
+        youthPlayerView.refresh();
+    }
 }

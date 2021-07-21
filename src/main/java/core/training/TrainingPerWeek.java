@@ -197,4 +197,25 @@ public class TrainingPerWeek  {
         var skillDropDay = o_TrainingDate.minus(Duration.ofHours(7*12)); // half week. TODO: check exact time difference
         return from.isBefore(skillDropDay) && !to.isBefore(skillDropDay);
     }
+
+    private String getSqlBetween()
+    {
+        var _startDate = o_TrainingDate.minus(7, ChronoUnit.DAYS);
+        String _firstMatchDate = DateTimeUtils.InstantToSQLtimeStamp(_startDate);
+        String _lastMatchDate = DateTimeUtils.InstantToSQLtimeStamp(o_TrainingDate.plus(23, ChronoUnit.HOURS));
+        return "MATCHDATE BETWEEN " + _firstMatchDate + " AND " + _lastMatchDate;
+    }
+
+    /**
+     * Load matches of natial team players in own team, during training week
+     * (used for experience calculation)
+     *
+     * @param nationalTeamID id of player's national team (it is NOT own team id)
+     * @return MatchKurzInfo array
+     */
+    public MatchKurzInfo[] loadMatchesOfNTPlayers(int nationalTeamID) {
+        final String where = "WHERE (HEIMID=" + nationalTeamID + " OR GASTID=" + nationalTeamID + ") AND " +
+                getSqlBetween() + " ORDER BY MatchDate DESC";
+        return DBManager.instance().getMatchesKurzInfo(where);
+    }
 }

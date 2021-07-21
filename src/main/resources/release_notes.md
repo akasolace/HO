@@ -65,7 +65,7 @@ layout: page
 ### Training
 - many buf fixes
 - fix training recap table's resetting scroll positions on table refresh  (#1011)
-
+- experience increase of new national hto matches (#1089)
 
 
 ### Misc

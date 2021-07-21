@@ -155,32 +155,8 @@ public class TrainingPerPlayer  {
 		this._TrainingWeek = trainingWeek;
 	}
 
-    public void addExperienceIncrease(int minutes, IMatchType _matchType) {
-		double p;
-
-		if (_matchType instanceof MatchType){
-			p = switch ((MatchType) _matchType){
-				case CUP, QUALIFICATION -> 2d;
-				case FRIENDLYNORMAL, FRIENDLYCUPRULES -> .1;
-				case INTFRIENDLYCUPRULES, INTFRIENDLYNORMAL -> .2;
-				case NATIONALFRIENDLY, LEAGUE -> 1d;
-				case MASTERS -> 5d;
-				case NATIONALCOMPCUPRULES, NATIONALCOMPNORMAL -> 10d;
-				// TODO:
-				//  WM-Spiel	28 -> 8d
-				//  WM-Halbfinal, WM-Final	56 -> 16d
-				//  Kontinentalmeisterschaftsspiel	14 -> 4d
-				//  Kontinentalmeisterschaftsspiel (Viertel-, Halbfinal, Final)	21 -> 6d
-				//  Nationenpokal	7 -> 2d
-				//  Nationenpokal (K.O.)	14 ->4d
-				default -> 0d;
-			};
-		}
-		else{
-			//case MatchTypeExtended.EMERALDCUP, MatchTypeExtended.RUBYCUP, MatchTypeExtended.SAPPHIRECUP -> .5;
-			p = 0.5;
-		}
-		this.experienceSub += minutes * p / 90. / 28.571;
+    public void addExperience(double inc) {
+		this.experienceSub += inc;
     }
 
 	public double getExperienceSub() {

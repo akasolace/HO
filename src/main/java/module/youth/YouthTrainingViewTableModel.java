@@ -1,12 +1,13 @@
 package module.youth;
 
+import core.gui.HOMainFrame;
 import core.gui.comp.entry.ColorLabelEntry;
 import core.gui.comp.entry.IHOTableEntry;
 import core.gui.comp.table.HOTableModel;
 import core.model.HOVerwaltung;
+import core.module.IModule;
+
 import javax.swing.*;
-import javax.swing.event.TableModelEvent;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -113,9 +114,13 @@ public class YouthTrainingViewTableModel extends HOTableModel {
 
     private void setTraining(YouthTraining t, YouthTraining.Priority prio, YouthTrainingType trainingType) {
         if ( t.getTraining(prio) != trainingType){
+
             t.setTraining(prio, trainingType);
             t.recalcSkills();
             t.store();
+
+            var youthPanel = (YouthPanel) HOMainFrame.instance().getTabbedPane().getModulePanel(IModule.YOUTH);
+            youthPanel.refreshYouthPlayerView();
         }
     }
 }

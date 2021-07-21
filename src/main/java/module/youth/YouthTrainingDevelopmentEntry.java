@@ -262,7 +262,7 @@ public class YouthTrainingDevelopmentEntry {
      * @return int
      */
     public int getPlayerAgeYears() {
-        return this.player.getAgeYears();
+        return this.player.getAgeYearsAtDate(this.training.getMatchDate());
     }
 
     /**
