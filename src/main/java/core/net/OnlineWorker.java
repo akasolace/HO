@@ -15,6 +15,7 @@ import core.model.enums.MatchTypeExtended;
 import core.model.match.*;
 import core.model.misc.Regiondetails;
 import core.model.misc.TrainingEvent;
+import core.prediction.engine.TeamRatings;
 import core.util.HOLogger;
 import core.util.Helper;
 import core.util.StringUtils;
@@ -360,7 +361,6 @@ public class OnlineWorker {
 				boolean success;
 				if ( (info.getMatchStatus() == MatchKurzInfo.FINISHED) && (! info.isObsolet())) {
 					lineup = downloadMatchlineup(matchID, info.getMatchType(), info.getHomeTeamID(), info.getGuestTeamID());
-
 					if (lineup == null) {
 						if ( !isSilentDownload()) {
 							String msg = getLangString("Downloadfehler")
@@ -372,7 +372,10 @@ public class OnlineWorker {
 						}
 						return false;
 					}
-					
+
+					downloadTeamRatings(matchID, info.getMatchType(), info.getHomeTeamID());
+					downloadTeamRatings(matchID, info.getMatchType(), info.getGuestTeamID());
+
 					// Get details with highlights.
 					showWaitInformation(10);
 					details = downloadMatchDetails(matchID, info.getMatchType(), lineup);
@@ -410,6 +413,20 @@ public class OnlineWorker {
 		}
 		showWaitInformation(0);
 		return true;
+	}
+
+	private static void downloadTeamRatings(int matchID, MatchType matchType, int teamID) {
+		try {
+			var xml = MyConnector.instance().getTeamdetails(teamID);
+			var teamrating = new MatchTeamRating(matchID, matchType, XMLTeamDetailsParser.parseTeamdetailsFromString(xml, teamID));
+			DBManager.instance().storeTeamRatings(teamrating);
+		} catch (Exception e) {
+			String msg = getLangString("Downloadfehler") + " : Error fetching Team ratings :";
+			// Info
+			setInfoMsg(msg, InfoPanel.FEHLERFARBE);
+			Helper.showMessage(HOMainFrame.instance(), msg, getLangString("Fehler"),
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	private static Map<String, String> getTeam(int teamId)

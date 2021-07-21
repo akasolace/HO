@@ -1,6 +1,8 @@
 // %3040931838:de.hattrickorganizer.logik.matchengine%
 package core.prediction.engine;
 
+import java.util.Map;
+
 public class TeamRatings {
     //~ Instance fields ----------------------------------------------------------------------------
 

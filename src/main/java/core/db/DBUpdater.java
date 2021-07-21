@@ -366,6 +366,9 @@ final class DBUpdater {
 
 		dbManager.getTable(MatchesKurzInfoTable.TABLENAME).tryAddColumn("isObsolete", "BOOLEAN");
 
+		if (!tableExists(MatchTeamRatingTable.TABLENAME)) {
+			dbManager.getTable(MatchTeamRatingTable.TABLENAME).createTable();
+		}
 		updateDBVersion(dbVersion, 500);
 	}
 

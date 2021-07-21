@@ -7,6 +7,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+@Deprecated
 public class AlltidLinkTest {
     private static void setEnvVariable(String name, String value) {
         try {

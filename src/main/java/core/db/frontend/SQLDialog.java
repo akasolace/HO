@@ -19,6 +19,7 @@ import java.awt.event.MouseEvent;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -178,7 +179,9 @@ public class SQLDialog extends JDialog implements ActionListener {
 
     public void refresh() {
         String txt = getTextArea().getText().toUpperCase();
-        if(txt.startsWith("SELECT", 0)){
+        var pattern = Pattern.compile("SELECT .* FROM ");
+        var matcher = pattern.matcher(txt);
+        if(matcher.find()){
             DummyTableModel model = new DummyTableModel(getValues(), columnNames);
             table.setModel(model);
         } else {

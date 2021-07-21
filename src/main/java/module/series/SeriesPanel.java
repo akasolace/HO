@@ -9,11 +9,13 @@ import core.gui.theme.HOIconName;
 import core.gui.theme.ThemeManager;
 import core.model.HOModel;
 import core.model.HOVerwaltung;
+import core.model.enums.MatchType;
 import core.model.enums.RatingsStatistics;
 import module.series.promotion.*;
-import module.series.statistics.DataDownloader;
+
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -28,7 +30,7 @@ public class SeriesPanel extends LazyImagePanel {
 	private MatchDayPanel[] matchDayPanels;
 	private SeriesHistoryPanel seriesHistoryPanel;
 	private Model model;
-	private Map<Integer, Map<RatingsStatistics,Integer>> leagueStatistics;
+	//private Map<Integer, Map<RatingsStatistics, Model.StatisticsEntry>> leagueStatistics;	// team id -> (statistic key -> value)
 	private PromotionInfoPanel promotionInfoPanel;
 	private LeaguePromotionHandler promotionHandler;
 	private HOModel homodel;
@@ -36,7 +38,7 @@ public class SeriesPanel extends LazyImagePanel {
 	@Override
 	protected void initialize() {
 		initPromotionHandler();
-		initLeagueStatsData();
+	//	initLeagueStatsData();
 		initComponents();
 		fillSaisonCB();
 		addListeners();
@@ -49,7 +51,7 @@ public class SeriesPanel extends LazyImagePanel {
 	}
 
 	private void initLeagueStatsData() {
-		homodel = HOVerwaltung.instance().getModel();
+		/*homodel = HOVerwaltung.instance().getModel();
 
 		int iSeason = homodel.getBasics().getSeason();
 		int iMatchPlayedThisSeason = homodel.getLeague().getSpieltag();
@@ -63,8 +65,9 @@ public class SeriesPanel extends LazyImagePanel {
 		else{
 			iMatchRound = iMatchPlayedThisSeason;
 		}
+*/
+		//leagueStatistics = DataDownloader.instance().fetchLeagueStatistics(iSerieID, iMatchRound, iSeason);
 
-		leagueStatistics = DataDownloader.instance().fetchLeagueStatistics(iSerieID, iMatchRound, iSeason);
 	}
 
 	@Override
@@ -165,7 +168,7 @@ public class SeriesPanel extends LazyImagePanel {
 
 	private void initComponents() {
 		this.model = new Model();
-		model.setLeagueStatistics(leagueStatistics);
+		//model.setLeagueStatistics(leagueStatistics);
 
 		setLayout(new BorderLayout());
 
@@ -307,4 +310,5 @@ public class SeriesPanel extends LazyImagePanel {
 			matchDayPanel.changeSeason();
 		}
 	}
+
 }

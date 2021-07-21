@@ -20,6 +20,7 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -303,11 +304,11 @@ class SeriesTablePanel extends ImagePanel {
 
 		if (leagueStatisticsTeam != null) {
 			String statType = (String) m_jcbStatsAggType.getSelectedItem();
-			((ColorLabelEntry) tableValues[iRow][11]).setText(leagueStatisticsTeam.get(RatingsStatistics.POWER_RATINGS).toString());
-			((ColorLabelEntry) tableValues[iRow][12]).setText(leagueStatisticsTeam.get(RatingsStatistics.getCode("total", statType)).toString());
-			((ColorLabelEntry) tableValues[iRow][13]).setText(leagueStatisticsTeam.get(RatingsStatistics.getCode("def", statType)).toString());
-			((ColorLabelEntry) tableValues[iRow][14]).setText(leagueStatisticsTeam.get(RatingsStatistics.getCode("mid", statType)).toString());
-			((ColorLabelEntry) tableValues[iRow][15]).setText(leagueStatisticsTeam.get(RatingsStatistics.getCode("off", statType)).toString());
+			((ColorLabelEntry) tableValues[iRow][11]).setText(getStatistcs(leagueStatisticsTeam, RatingsStatistics.POWER_RATINGS, statType).toString());
+			((ColorLabelEntry) tableValues[iRow][12]).setText(getStatistcs(leagueStatisticsTeam, RatingsStatistics.HATSTATS_TOTAL, statType).toString());
+			((ColorLabelEntry) tableValues[iRow][13]).setText(getStatistcs(leagueStatisticsTeam, RatingsStatistics.HATSTATS_DEF, statType).toString());
+			((ColorLabelEntry) tableValues[iRow][14]).setText(getStatistcs(leagueStatisticsTeam, RatingsStatistics.HATSTATS_MID, statType).toString());
+			((ColorLabelEntry) tableValues[iRow][15]).setText(getStatistcs(leagueStatisticsTeam, RatingsStatistics.HATSTATS_OFF, statType).toString());
 		}
 		else{
 			((ColorLabelEntry) tableValues[iRow][11]).setText("");
@@ -316,6 +317,17 @@ class SeriesTablePanel extends ImagePanel {
 			((ColorLabelEntry) tableValues[iRow][14]).setText("");
 			((ColorLabelEntry) tableValues[iRow][15]).setText("");
 		}
+	}
+
+	private Integer getStatistcs(Map<RatingsStatistics, Model.StatisticsEntry> leagueStatisticsTeam, RatingsStatistics key, String statType) {
+		if ( leagueStatisticsTeam.containsKey(key)){
+			var stat = leagueStatisticsTeam.get(key);
+			if (statType.equalsIgnoreCase("max")){
+				return stat.getMax();
+			}
+			return stat.getAverage();
+		}
+		return 0;
 	}
 
 	private void populateSerieTableStatsOnly() {

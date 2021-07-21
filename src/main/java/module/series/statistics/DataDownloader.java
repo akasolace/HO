@@ -19,6 +19,7 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
+@Deprecated
 public class DataDownloader {
 
     private final static String ALLTID_SERVER_BASEURL = "https://hattid.com/api";
@@ -113,16 +114,16 @@ public class DataDownloader {
                         int iTeamID = teamSortingKey.get("teamId").getAsInt();
 
                         int rating = ((JsonObject) entity).get("hatStats").getAsInt();
-                        teamStat.put(RatingsStatistics.getCode("total", dataType), rating);
+//                        teamStat.put(RatingsStatistics.getCode("total", dataType), rating);
 
                         rating = ((JsonObject) entity).get("midfield").getAsInt();
-                        teamStat.put(RatingsStatistics.getCode("mid", dataType), rating * 3);
+//                        teamStat.put(RatingsStatistics.getCode("mid", dataType), rating * 3);
 
                         rating = ((JsonObject) entity).get("defense").getAsInt();
-                        teamStat.put(RatingsStatistics.getCode("def", dataType), rating);
+//                        teamStat.put(RatingsStatistics.getCode("def", dataType), rating);
 
                         rating = ((JsonObject) entity).get("attack").getAsInt();
-                        teamStat.put(RatingsStatistics.getCode("off", dataType), rating);
+//                        teamStat.put(RatingsStatistics.getCode("off", dataType), rating);
 
                         result.put(iTeamID, teamStat);
                     }

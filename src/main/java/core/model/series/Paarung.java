@@ -265,7 +265,7 @@ public class Paarung implements Comparable<Paarung>{
         return false;
     }
 
-    public final boolean hatStattgefunden() {
+    public final boolean isGameOver() {
         return (m_iToreHeim > -1) && (m_iToreGast > -1);
     }
 }

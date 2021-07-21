@@ -74,20 +74,28 @@ public class Matchdetails implements core.model.match.IMatchDetails {
 
     private CupLevel m_mtCupLevel = CupLevel.NONE;
     private CupLevelIndex m_mtCupLevelIndex = CupLevelIndex.NONE;
-    /** MatchContextId */
+    /**
+     * MatchContextId
+     */
     private int iMatchContextId;
+
     public int getMatchContextId() {
         return iMatchContextId;
     }
+
     public void setMatchContextId(int iMatchContextId) {
         this.iMatchContextId = iMatchContextId;
     }
 
-    /** TournamentTypeID */
+    /**
+     * TournamentTypeID
+     */
     private int iTournamentTypeID;
+
     public int getTournamentTypeID() {
         return iTournamentTypeID;
     }
+
     public void setTournamentTypeID(int iTournamentTypeID) {
         this.iTournamentTypeID = iTournamentTypeID;
     }
@@ -135,8 +143,8 @@ public class Matchdetails implements core.model.match.IMatchDetails {
     private String homeFormation;
     private String awayFormation;
 
-    public String getResultInPart(MatchEvent.MatchPartId part){
-        if ( homeGoalsInParts != null){
+    public String getResultInPart(MatchEvent.MatchPartId part) {
+        if (homeGoalsInParts != null) {
             return getResultString(homeGoalsInParts[part.getValue()], guestGoalsInParts[part.getValue()], "");
         }
         return "";
@@ -162,11 +170,11 @@ public class Matchdetails implements core.model.match.IMatchDetails {
         return "";
     }
 
-    public String getResult(){
-        if ( this.getFetchDatum() != null){
-            return getResultString(this.m_iHomeGoals, this.m_iGuestGoals,"");
+    public String getResult() {
+        if (this.getFetchDatum() != null) {
+            return getResultString(this.m_iHomeGoals, this.m_iGuestGoals, "");
         }
-        return getResultString(-1,-1,"");
+        return getResultString(-1, -1, "");
     }
 
     // Return match result extension information as abbreviation string
@@ -175,10 +183,10 @@ public class Matchdetails implements core.model.match.IMatchDetails {
         return getResultExtensionAbbreviation(getLastMinuteFromPartInfo());
     }
 
-    private int getLastMinuteFromPartInfo(){
-        if ( homeGoalsInParts != null){
-            if ( homeGoalsInParts[4] != null ) return 130;
-            if ( homeGoalsInParts[3] != null ) return 120;
+    private int getLastMinuteFromPartInfo() {
+        if (homeGoalsInParts != null) {
+            if (homeGoalsInParts[4] != null) return 130;
+            if (homeGoalsInParts[3] != null) return 120;
             return 90;
         }
         return getLastMinute();
@@ -186,8 +194,9 @@ public class Matchdetails implements core.model.match.IMatchDetails {
 
     static String afterPenalties = HOVerwaltung.instance().getLanguageString("ls.match.after.penalties.abbreviation");
     static String afterExtension = HOVerwaltung.instance().getLanguageString("ls.match.after.extension.abbreviation");
-    public static  String getResultExtensionAbbreviation(Integer duration){
-        if ( duration != null) {
+
+    public static String getResultExtensionAbbreviation(Integer duration) {
+        if (duration != null) {
             if (duration > 120)
                 return afterPenalties;
             if (duration > 110)
@@ -197,14 +206,14 @@ public class Matchdetails implements core.model.match.IMatchDetails {
     }
 
     // results like : 2 - 4 a.p.
-    public String getResultEx(){
+    public String getResultEx() {
         return getResultString(this.m_iHomeGoals, this.m_iGuestGoals, getResultExtensionAbbreviation());
     }
 
     // results like : 1 - 1 (2 - 4 a.p.)
-    public String getResultLong(){
+    public String getResultLong() {
         String res = getResultAfterPart(MatchEvent.MatchPartId.SECOND_HALF);
-        if ( getLastMinuteFromPartInfo() > 110){
+        if (getLastMinuteFromPartInfo() > 110) {
             res += " (" + getResultEx() + ")";
         }
         return res;
@@ -219,15 +228,14 @@ public class Matchdetails implements core.model.match.IMatchDetails {
     private static int maxMatchdetailsReloadsPerSession = 10;
 
     // Enable explicit download of match details (e. g. invoked by user clicks)
-    public static Matchdetails getMatchdetails(int matchId, MatchType type, boolean force)
-    {
-        if ( force && maxMatchdetailsReloadsPerSession==0){
-            maxMatchdetailsReloadsPerSession=1;
+    public static Matchdetails getMatchdetails(int matchId, MatchType type, boolean force) {
+        if (force && maxMatchdetailsReloadsPerSession == 0) {
+            maxMatchdetailsReloadsPerSession = 1;
         }
         return getMatchdetails(matchId, type);
     }
 
-    public static Matchdetails getMatchdetails(int matchId, MatchType type){
+    public static Matchdetails getMatchdetails(int matchId, MatchType type) {
         var ret = DBManager.instance().loadMatchDetails(type.getId(), matchId);
         ret.setMatchType(type);
         ret.setSourceSystem(type.getSourceSystem());
@@ -252,68 +260,67 @@ public class Matchdetails implements core.model.match.IMatchDetails {
 
     public int getLastMinute() {
         var highlights = getHighlights();
-        if ( highlights != null && highlights.size()>0){
-            return highlights.get(highlights.size()-1).getMinute();
+        if (highlights != null && highlights.size() > 0) {
+            return highlights.get(highlights.size() - 1).getMinute();
         }
         return -1;
     }
 
     public Integer getHomeGoalsInPart(MatchEvent.MatchPartId matchPartId) {
-        if ( homeGoalsInParts == null){
+        if (homeGoalsInParts == null) {
             InitGoalsInParts();
         }
         return homeGoalsInParts[matchPartId.getValue()];
     }
+
     public Integer getGuestGoalsInPart(MatchEvent.MatchPartId matchPartId) {
-        if ( guestGoalsInParts == null){
+        if (guestGoalsInParts == null) {
             InitGoalsInParts();
         }
         return guestGoalsInParts[matchPartId.getValue()];
     }
 
     private void InitGoalsInParts() {
-        int totalHome=0;
-        int totalGuest=0;
-        int lastPart=0;
+        int totalHome = 0;
+        int totalGuest = 0;
+        int lastPart = 0;
         homeGoalsInParts = new Integer[MatchEvent.MatchPartId.values().length];
-        guestGoalsInParts= new Integer[MatchEvent.MatchPartId.values().length];
-        for ( var event : getHighlights()){
+        guestGoalsInParts = new Integer[MatchEvent.MatchPartId.values().length];
+        for (var event : getHighlights()) {
             int part = 0;
 
             var partId = event.getMatchPartId();
-            if ( partId == MatchEvent.MatchPartId.PENALTY_CONTEST &&
-                event.isEndOfMatchEvent() ){
+            if (partId == MatchEvent.MatchPartId.PENALTY_CONTEST &&
+                    event.isEndOfMatchEvent()) {
                 // HO shifted match end event of extra time part (3) to part 4
                 break;
             }
 
             if (partId != null) part = partId.getValue();
-            if ( homeGoalsInParts[part] == null) {
+            if (homeGoalsInParts[part] == null) {
                 homeGoalsInParts[part] = 0;
                 guestGoalsInParts[part] = 0;
-                lastPart=part;
+                lastPart = part;
             }
             var eventId = event.getMatchEventID().getValue();
-            if ( eventId>99 && eventId<200 ||
-                    eventId>54 && eventId<58
+            if (eventId > 99 && eventId < 200 ||
+                    eventId > 54 && eventId < 58
             ) {
                 // goal
                 if (event.getTeamID() == this.m_iHeimId ||
                         event.getTeamID() <= 0 && this.m_iHeimId <= 0) { // Verlegenheitstruppe has id < 0 are stored as 0 in event
-                        homeGoalsInParts[part]++;
-                        totalHome++;
+                    homeGoalsInParts[part]++;
+                    totalHome++;
                 } else {
                     guestGoalsInParts[part]++;
                     totalGuest++;
                 }
-            }
-            else if ( eventId == MatchEvent.MatchEventID.HOME_TEAM_WALKOVER.getValue()){
+            } else if (eventId == MatchEvent.MatchEventID.HOME_TEAM_WALKOVER.getValue()) {
                 guestGoalsInParts[0] = 5;
-                totalGuest=5;
-            }
-            else if ( eventId == MatchEvent.MatchEventID.AWAY_TEAM_WALKOVER.getValue()){
+                totalGuest = 5;
+            } else if (eventId == MatchEvent.MatchEventID.AWAY_TEAM_WALKOVER.getValue()) {
                 homeGoalsInParts[0] = 5;
-                totalHome=5;
+                totalHome = 5;
             }
         }
         verifyGoalsInParts(lastPart, totalHome, totalGuest);
@@ -325,22 +332,22 @@ public class Matchdetails implements core.model.match.IMatchDetails {
      * If match event result differs from match details end result, all goal will be shifted to the last
      * mentioned match part.
      *
-     * @param lastPart last mentioned match part
-     * @param totalHome number of home goals counted by match events
+     * @param lastPart   last mentioned match part
+     * @param totalHome  number of home goals counted by match events
      * @param totalGuest number of guest goals counted by match events
      */
     private void verifyGoalsInParts(int lastPart, int totalHome, int totalGuest) {
         var homeEnd = this.getHomeGoals();
         var guestEnd = this.getGuestGoals();
-        if ( totalHome != homeEnd || totalGuest != guestEnd){
-            for ( int i=0; i<lastPart; i++){
-                if ( homeGoalsInParts[i] != null) {
-                    homeGoalsInParts[i]=0;
-                    guestGoalsInParts[i]=0;
+        if (totalHome != homeEnd || totalGuest != guestEnd) {
+            for (int i = 0; i < lastPart; i++) {
+                if (homeGoalsInParts[i] != null) {
+                    homeGoalsInParts[i] = 0;
+                    guestGoalsInParts[i] = 0;
                 }
             }
-            homeGoalsInParts[lastPart]=homeEnd;
-            guestGoalsInParts[lastPart]=guestEnd;
+            homeGoalsInParts[lastPart] = homeEnd;
+            guestGoalsInParts[lastPart] = guestEnd;
         }
     }
 
@@ -358,6 +365,42 @@ public class Matchdetails implements core.model.match.IMatchDetails {
 
     public void setSourceSystem(SourceSystem sourceSystem) {
         this.sourceSystem = sourceSystem;
+    }
+
+    public int getHatStats(int teamId) {
+        if (teamId == this.m_iHeimId) {
+            return this.getHomeHatStats();
+        } else if (teamId == this.m_iGastId) {
+            return this.getAwayHatStats();
+        }
+        return 0;
+    }
+
+    public int getSumHatStatsMidfield(int teamId) {
+        if (teamId == this.m_iHeimId) {
+            return 3*this.getHomeMidfield();
+        } else if (teamId == this.m_iGastId) {
+            return 3*this.getGuestMidfield();
+        }
+        return 0;
+    }
+
+    public int getSumHatStatsAttack(int teamId) {
+        if (teamId == this.m_iHeimId) {
+            return this.getHomeLeftAtt() + this.getHomeMidAtt() + this.getHomeRightAtt();
+        } else if (teamId == this.m_iGastId) {
+            return this.getGuestLeftAtt() + this.getGuestMidAtt() + this.getHomeRightAtt();
+        }
+        return 0;
+    }
+
+    public int getSumHatStatsDefence(int teamId) {
+        if (teamId == this.m_iHeimId) {
+            return this.getHomeLeftDef() + this.getHomeMidDef() + this.getHomeRightDef();
+        } else if (teamId == this.m_iGastId) {
+            return this.getGuestLeftDef() + this.getGuestMidDef() + this.getHomeRightDef();
+        }
+        return 0;
     }
 
     public enum eInjuryType {
@@ -482,7 +525,7 @@ public class Matchdetails implements core.model.match.IMatchDetails {
 
     public final int getGuestHalfTimeGoals() {
         ArrayList<MatchEvent> highLights = getHighlights();
-        if ( highLights != null) {
+        if (highLights != null) {
             for (MatchEvent iMatchHighlight : highLights) {
                 if (iMatchHighlight.getMatchEventCategory() == 0 && iMatchHighlight.getiMatchEventID() == 45)
                     return iMatchHighlight.getGastTore();
@@ -493,7 +536,7 @@ public class Matchdetails implements core.model.match.IMatchDetails {
 
     public final int getHomeHalfTimeGoals() {
         ArrayList<MatchEvent> highLights = getHighlights();
-        if ( highLights != null) {
+        if (highLights != null) {
             for (MatchEvent iMatchHighlight : highLights) {
                 if (iMatchHighlight.getMatchEventCategory() == 0 && iMatchHighlight.getiMatchEventID() == 45)
                     return iMatchHighlight.getHeimTore();
@@ -929,35 +972,32 @@ public class Matchdetails implements core.model.match.IMatchDetails {
 
     /**
      * Getter for property m_vHighlights.
-     *
-     *    checks if database object needs an update from chpp (OnlineWorker)
-     *    Number of implicite updates per session is limited to maxMatchdetailsReloadsPerSession
+     * <p>
+     * checks if database object needs an update from chpp (OnlineWorker)
+     * Number of implicite updates per session is limited to maxMatchdetailsReloadsPerSession
      *
      * @return Value of property m_vHighlights.
      */
     public final ArrayList<MatchEvent> getHighlights() {
-        if ( this.getMatchID()> -1 && ( m_vHighlights == null || m_vHighlights.size() == 0)){
+        if (this.getMatchID() > -1 && (m_vHighlights == null || m_vHighlights.size() == 0)) {
             m_vHighlights = DBManager.instance().getMatchHighlights(this.getMatchType().getId(), this.getMatchID());
 
-            if ( maxMatchdetailsReloadsPerSession>0 && this.m_MatchTyp.isOfficial()) {
-                if ( m_vHighlights.size() == 0 || m_vHighlights.get(0).getMatchPartId() == null) {
+            if (maxMatchdetailsReloadsPerSession > 0 && this.m_MatchTyp.isOfficial()) {
+                if (m_vHighlights.size() == 0 || m_vHighlights.get(0).getMatchPartId() == null) {
                     HOLogger.instance().info(Matchdetails.class,
-                            "Reload Matchdetails id: "+ this.getMatchID());
+                            "Reload Matchdetails id: " + this.getMatchID());
                     boolean silenDownloadMode = OnlineWorker.isSilentDownload();
                     try {
                         OnlineWorker.setSilentDownload(true);
-                        if ( OnlineWorker.downloadMatchData(this.getMatchID(), this.m_MatchTyp, true) ) {
+                        if (OnlineWorker.downloadMatchData(this.getMatchID(), this.m_MatchTyp, true)) {
                             m_vHighlights = DBManager.instance().getMatchHighlights(this.getMatchType().getId(), this.getMatchID());
                             maxMatchdetailsReloadsPerSession--;
+                        } else {
+                            maxMatchdetailsReloadsPerSession = 0;
                         }
-                        else {
-                            maxMatchdetailsReloadsPerSession=0;
-                        }
-                    }
-                    catch (Exception ex){
+                    } catch (Exception ex) {
                         HOLogger.instance().error(Matchdetails.class, ex.getMessage());
-                    }
-                    finally {
+                    } finally {
                         OnlineWorker.setSilentDownload(silenDownloadMode);
                     }
                 }
@@ -1317,10 +1357,11 @@ public class Matchdetails implements core.model.match.IMatchDetails {
 
     /**
      * Load the lineup of user's team
+     *
      * @return MatchLineupTeam
      */
     public MatchLineupTeam getTeamLineup() {
-        if ( teamLineup == null){
+        if (teamLineup == null) {
             teamLineup = DBManager.instance().getMatchLineupTeam(this.getMatchType().getId(), this.getMatchID(), MatchKurzInfo.user_team_id);
         }
         return teamLineup;
@@ -1455,7 +1496,6 @@ public class Matchdetails implements core.model.match.IMatchDetails {
         this.setGuestHatStats();
     }
 
-
     public final int getHomeHatStats() {
         return this.m_iHomeHatStats;
     }
@@ -1561,21 +1601,21 @@ public class Matchdetails implements core.model.match.IMatchDetails {
     }
 
     private Boolean isWalkoverMatchWin;
+
     // return true, if the opponent team didn't appear. The match was won by 5-0
     public boolean isWalkoverMatchWin(int teamId) {
-        if ( isWalkoverMatchWin == null) {
+        if (isWalkoverMatchWin == null) {
             isWalkoverMatchWin = false;
             if (getLastMinute() == 0) {
                 // Duration of walk over matches is 0 minutes
                 for (var e : getHighlights()) {
-                    if ( e.getMatchEventID() == MatchEvent.MatchEventID.AWAY_TEAM_WALKOVER ) {
+                    if (e.getMatchEventID() == MatchEvent.MatchEventID.AWAY_TEAM_WALKOVER) {
                         if (this.m_iHeimId == teamId) {
                             isWalkoverMatchWin = true;
                         }
                         break;
-                    }
-                    else if ( e.getMatchEventID() == MatchEvent.MatchEventID.HOME_TEAM_WALKOVER){
-                        if (this.m_iGastId == teamId){
+                    } else if (e.getMatchEventID() == MatchEvent.MatchEventID.HOME_TEAM_WALKOVER) {
+                        if (this.m_iGastId == teamId) {
                             isWalkoverMatchWin = true;
                         }
                         break;
@@ -1585,5 +1625,4 @@ public class Matchdetails implements core.model.match.IMatchDetails {
         }
         return isWalkoverMatchWin;
     }
-
 }

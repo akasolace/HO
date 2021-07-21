@@ -140,6 +140,9 @@ public class XMLTeamDetailsParser {
 				HOLogger.instance().log(XMLTeamDetailsParser.class, exp);
 			}
 
+			var fanclub = (Element) team.getElementsByTagName("Fanclub").item(0);
+			xmlValue2Hash(hash, fanclub, "FanclubSize");
+
 			root = (Element) team.getElementsByTagName("Trainer").item(0);
 			xmlValue2Hash(hash, root, "PlayerID", "TrainerID");
 

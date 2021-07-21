@@ -505,7 +505,7 @@ public class MyConnector {
 	 * holt die Teamdetails
 	 */
 	public String getTeamdetails(int teamId) throws IOException {
-		String url = htUrl + "?file=teamdetails&version=2.9";
+		String url = htUrl + "?file=teamdetails&version=3.5";
 		if (teamId > 0) {
 			url += ("&teamID=" + teamId);
 		}

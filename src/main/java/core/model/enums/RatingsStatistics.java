@@ -3,15 +3,10 @@ package core.model.enums;
 
 public enum RatingsStatistics {
     POWER_RATINGS(1),
-    HATSTATS_TOTAL_MAX(2),
-    HATSTATS_DEF_MAX(3),
-    HATSTATS_MID_MAX(4),
-    HATSTATS_OFF_MAX(5),
-    HATSTATS_TOTAL_AVG(6),
-    HATSTATS_DEF_AVG(7),
-    HATSTATS_MID_AVG(8),
-    HATSTATS_OFF_AVG(9);
-
+    HATSTATS_TOTAL(2),
+    HATSTATS_DEF(3),
+    HATSTATS_MID(4),
+    HATSTATS_OFF(5);
     private int value;
 
     RatingsStatistics(int value) {
@@ -21,7 +16,7 @@ public enum RatingsStatistics {
     public int getValue() {
         return value;
     }
-
+/*
     public static RatingsStatistics getCode(String sector, String stat){
 
         if (stat.equalsIgnoreCase("max"))
@@ -44,4 +39,5 @@ public enum RatingsStatistics {
 
         throw new IllegalStateException("Unexpected value: " + sector.toLowerCase());
     }
+*/
 }
